@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import numpy as np
 import os
-from PIL import Image 
+#from PIL import Image 
 import math
 
 def hsl2rgb(inputColor):
@@ -122,7 +122,7 @@ def rgb2hsl_matrix(colors):
     var_Rs=colors[:,0]/255.0
     var_Gs=colors[:,1]/255.0
     var_Bs=colors[:,2]/255.0
-    var_Min=np.amin(colors/255.0,axis=1) # 每行中即R,G,B中最小的
+    var_Min=np.amin(colors/255.0,axis=1) # find the minvalue of R,G,B
     var_Max=np.amax(colors/255.0,axis=1)
     del_Max=var_Max-var_Min
     ls=(var_Max+var_Min)/2.0
@@ -147,21 +147,5 @@ def rgb2hsl_matrix(colors):
     hs=np.where(hs>1.0,hs-1.0,hs)
     ss=np.where(del_Max!=0,ss,0.0)
 
-    hsl=np.vstack((hs,ss,ls)).transpose()  #一行行拼接，构成3*n矩阵，再转置
+    hsl=np.vstack((hs,ss,ls)).transpose()  
     return hsl
-
-#img = Image.open('input/test1.jpg')
-#im = np.array(img)
-#print im.shape
-
-#for i in range(len(im[:,1])):
-#    for j in range(len(im[1,:])):
-#        h,s,l = RGB_to_HSL(im[i][j][0],im[i][j][1],im[i][j][2])
-#        h = h+0.3
-#        if h > 1:
-#            h = h - 1
-#        r,g,b = HSL_to_RGB(h,s,l)
-#        im[i][j][0] = r
-#        im[i][j][1] = g
-#        im[i][j][2] = b
-#scipy.misc.imsave('result.jpg', im)
