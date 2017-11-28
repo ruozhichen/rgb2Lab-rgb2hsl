@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import numpy as np
 import os
-#from PIL import Image 
+from PIL import Image 
 import math
 
 def hsl2rgb(inputColor):
@@ -17,6 +17,12 @@ def hsl2rgb(inputColor):
         Ouput:
             (r,g,b) (integers 0...255) : Corresponding RGB values
        
+        Examples:
+            >>> print HSL_to_RGB(0.7,0.7,0.6)
+            (110, 82, 224)
+            >>> r,g,b = HSL_to_RGB(0.7,0.7,0.6)
+            >>> print g
+            82
     '''
     h=inputColor[0]
     s=inputColor[1]
@@ -69,7 +75,10 @@ def hsl2rgb_matrix(colors):
     Rs=np.where(ss==0.0,ls*255,Rs)
     Gs=np.where(ss==0.0,ls*255,Gs)
     Bs=np.where(ss==0.0,ls*255,Bs)
-    RGBs=np.vstack((Rs,Gs,Bs)).transpose() 
+    Rs=np.maximum(np.minimum(Rs,255),0)
+    Gs=np.maximum(np.minimum(Gs,255),0)
+    Bs=np.maximum(np.minimum(Bs,255),0)
+    RGBs=np.vstack((Rs,Gs,Bs)).transpose()  # 3*n -> n*3
     RGBs=RGBs.astype('int')
     return RGBs
 
@@ -83,6 +92,13 @@ def rgb2hsl(inputColor):
        
         Ouput:
             (h,s,l) (floats 0...1): corresponding HSL values
+       
+        Example:
+            >>> print RGB_to_HSL(110,82,224)
+            (0.69953051643192476, 0.69607843137254899, 0.59999999999999998)
+            >>> h,s,l = RGB_to_HSL(110,82,224)
+            >>> print s
+            0.696078431373
     '''
     r=inputColor[0]
     g=inputColor[1]
@@ -122,15 +138,17 @@ def rgb2hsl_matrix(colors):
     var_Rs=colors[:,0]/255.0
     var_Gs=colors[:,1]/255.0
     var_Bs=colors[:,2]/255.0
-    var_Min=np.amin(colors/255.0,axis=1) # find the minvalue of R,G,B
+    var_Min=np.amin(colors/255.0,axis=1) # min(Ri,Gi,Bi) in each row
     var_Max=np.amax(colors/255.0,axis=1)
     del_Max=var_Max-var_Min
     ls=(var_Max+var_Min)/2.0
     hs=0.0
     ss=0.0
+    # When del_Max=0,it may exist the situation that var_Max+var_Min or 2.0-var_Max-var_Min = 0
+    # and the program would report error "invalid value encountered in divide"
+    # However, at the end it will set zero when del_Max=0 
+    # so I ignore the error here
     # https://docs.scipy.org/doc/numpy/reference/generated/numpy.seterr.html
-    # There may exist some cases divided by zero, but in the end thoses cases will be assigned zero
-    # so I ingnore divide or invalid errors
     np.seterr(divide='ignore', invalid='ignore')
     ss=np.where(ls<0.5,del_Max/(var_Max+var_Min),del_Max/(2.0-var_Max-var_Min))
     
@@ -147,5 +165,21 @@ def rgb2hsl_matrix(colors):
     hs=np.where(hs>1.0,hs-1.0,hs)
     ss=np.where(del_Max!=0,ss,0.0)
 
-    hsl=np.vstack((hs,ss,ls)).transpose()  
+    hsl=np.vstack((hs,ss,ls)).transpose() 
     return hsl
+
+#img = Image.open('input/test1.jpg')
+#im = np.array(img)
+#print im.shape
+
+#for i in range(len(im[:,1])):
+#    for j in range(len(im[1,:])):
+#        h,s,l = RGB_to_HSL(im[i][j][0],im[i][j][1],im[i][j][2])
+#        h = h+0.3
+#        if h > 1:
+#            h = h - 1
+#        r,g,b = HSL_to_RGB(h,s,l)
+#        im[i][j][0] = r
+#        im[i][j][1] = g
+#        im[i][j][2] = b
+#scipy.misc.imsave('result.jpg', im)
