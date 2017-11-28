@@ -40,13 +40,15 @@ def hsl2rgb(inputColor):
    
     r,b,g = (l*255,)*3
     if s!=0.0:
-       if l<0.5 : var_2 = l * ( 1.0 + s )
-       else     : var_2 = ( l + s ) - ( s * l )
-       var_1 = 2.0 * l - var_2
-       r = 255 * hue2rgb( var_1, var_2, h + ( 1.0 / 3.0 ) )
-       g = 255 * hue2rgb( var_1, var_2, h )
-       b = 255 * hue2rgb( var_1, var_2, h - ( 1.0 / 3.0 ) )
-      
+       	if l<0.5 : var_2 = l * ( 1.0 + s )
+       	else     : var_2 = ( l + s ) - ( s * l )
+       	var_1 = 2.0 * l - var_2
+       	r = 255 * hue2rgb( var_1, var_2, h + ( 1.0 / 3.0 ) )
+       	g = 255 * hue2rgb( var_1, var_2, h )
+       	b = 255 * hue2rgb( var_1, var_2, h - ( 1.0 / 3.0 ) )
+    r=max(min(r,255.0),0.0)
+    g=max(min(g,255.0),0.0)
+    b=max(min(b,255.0),0.0)
     return (int(round(r)),int(round(g)),int(round(b)))
 
 def hue2rgb_matrix(v1,v2,vH):
